@@ -8,6 +8,9 @@
 yt-dlp is downloaded automatically into `./bin` on first use (needs internet access to github.com).
 
 ## If YouTube says "Sign in to confirm you're not a bot" / Instagram says "login required"
-Datacenter IPs get blocked. Export cookies from a browser where you are logged in
-(extension "Get cookies.txt LOCALLY"), save as Netscape `cookies.txt` and put it in the project root
-(or `cookies_youtube.txt` / `cookies_instagram.txt`). Optional env: `YT_COOKIES_FILE`, `IG_COOKIES_FILE`, `YT_DLP_PROXY`.
+Datacenter IPs get blocked. Do not send your cookies to anyone. Export your own cookies
+from a browser where you are logged in, in Netscape format, and provide them to Railway
+as a private secret. The preferred option is `YT_COOKIES_B64` (base64 contents of the file);
+`YT_COOKIES_FILE` is also supported when using a mounted private volume. For Instagram use
+`IG_COOKIES_B64` or `IG_COOKIES_FILE`. Never commit `cookies*.txt` to GitHub. `YT_DLP_PROXY`
+is intentionally not required and should not be used to bypass provider controls.

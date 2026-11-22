@@ -99,6 +99,21 @@ async function getYtDlp() {
 }
 
 function cookiesFor(kind) {
+  const encoded = kind === "youtube" ? process.env.YT_COOKIES_B64 : process.env.IG_COOKIES_B64;
+  if (encoded) {
+    try {
+      const dir = path.join(os.tmpdir(), "marco-cookies");
+      const file = path.join(dir, kind + "-cookies.txt");
+      fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+      const data = Buffer.from(encoded, "base64");
+      if (data.length > 20 && data.length < 5 * 1024 * 1024) {
+        fs.writeFileSync(file, data, { mode: 0o600 });
+        return file;
+      }
+    } catch (e) {
+      console.error("[YTDLP] could not prepare cookie secret:", e.message);
+    }
+  }
   const files = [
     kind === "instagram" ? process.env.IG_COOKIES_FILE : null,
     process.env.YT_COOKIES_FILE,
@@ -114,7 +129,7 @@ function friendlyError(text) {
   const s = String(text || "");
   if (/larger than max-filesize|File is larger/i.test(s)) return "FILE_TOO_LARGE";
   if (/Sign in to confirm|not a bot|confirm you.re not a bot/i.test(s))
-    return "YouTube is asking this server to sign in (bot check). Add a cookies.txt file (see README_DOWNLOADS.md) and try again.";
+    return "YouTube bot-check blocked this server. Set YT_COOKIES_B64 or YT_COOKIES_FILE with your own Netscape cookies, then redeploy.";
   if (/login required|rate-limit reached|Requested content is not available|empty media response|restricted video/i.test(s))
     return "Instagram requires login for this post. Add an Instagram cookies.txt file (see README_DOWNLOADS.md) or make sure the post is public.";
   if (/Private video|private/i.test(s)) return "This video is private.";
